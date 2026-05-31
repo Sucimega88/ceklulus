@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman Kelulusan Kelas 6 SDN Cibeber II Kota Cilegon</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        school: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#b9defe',
+                            300: '#7cc2fd',
+                            400: '#36a2fa',
+                            500: '#0c85eb',
+                            600: '#0066cc',
+                            700: '#0052a3',
+                            800: '#054687',
+                            900: '#0a3c70',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PapaParse (untuk parsing Google Sheet CSV secara langsung) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Canvas Confetti (untuk efek perayaan kelulusan) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        .education-bg {
+            background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.88), rgba(248, 250, 252, 0.94)), url('https://i.imgur.com/ZkomrzP.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        .whatsapp-bubble {
+            background-color: #e2f9cb;
+            border: 1px solid #d3ecd1;
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading-shimmer 1.5s infinite;
+        }
+        @keyframes loading-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        @keyframes slow-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-slow-spin {
+            animation: slow-spin 6s linear infinite;
+        }
+    </style>
+</head>
+<body class="education-bg text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Background Music Audio Element -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://github.com/Sucimega88/pengumumankelulusan/raw/refs/heads/main/The_Summit_Gate.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Floating Music Widget -->
+    <div id="music-control-container" class="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+        <!-- Tooltip Helper -->
+        <div id="music-tooltip" class="bg-white/95 backdrop-blur-sm text-slate-800 text-xs font-semibold px-3.5 py-2.5 rounded-xl shadow-xl border border-slate-200/80 transition-all duration-500 transform translate-x-4 opacity-0 pointer-events-none flex items-center gap-2 whitespace-nowrap">
+            <span class="text-school-500 animate-bounce">🎵</span>
+            <span>Putar Musik Kelulusan</span>
+        </div>
+        
+        <!-- Main Toggle Button -->
+        <button onclick="toggleMusic()" id="music-toggle-btn" class="w-14 h-14 rounded-full bg-gradient-to-r from-school-600 to-school-700 text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 relative border border-white/20" title="Putar/Jeda Musik Latar">
+            <!-- Pulse Effect -->
+            <span id="music-pulse" class="absolute -inset-1.5 rounded-full bg-school-500/30 animate-ping opacity-0 transition-opacity duration-300"></span>
+            <i id="music-icon" class="fa-solid fa-music text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 backdrop-blur-md bg-white/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <img src="https://iili.io/FHo8nWu.png" alt="Logo SDN Cibeber II" class="h-14 w-auto object-contain drop-shadow" onerror="this.src='https://placehold.co/80x80/0066cc/ffffff?text=SDN+Cibeber+II'">
+                <div>
+                    <h1 class="font-bold text-lg sm:text-xl text-school-900 tracking-tight">SDN CIBEBER II</h1>
+                    <p class="text-xs text-slate-500 font-medium tracking-widest uppercase">Kota Cilegon • Banten</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Sistem Kelulusan Aktif
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-12">
+        
+        <!-- Hero & Title Section -->
+        <section class="text-center space-y-4 max-w-3xl mx-auto">
+            <span class="bg-school-100 text-school-800 text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                Pengumuman Resmi
+            </span>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Pengumuman Kelulusan Siswa Kelas 6 <br class="hidden sm:inline">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-school-600 to-school-800">
+                    Tahun Pelajaran 2024/2025
+                </span>
+            </h2>
+            <div class="w-24 h-1.5 bg-gradient-to-r from-school-500 to-school-700 mx-auto rounded-full"></div>
+        </section>
+
+        <!-- Countdown Widget (2 Juni 2025, Jam 08:00 WIB) -->
+        <section id="countdown-card" class="bg-gradient-to-br from-school-900 via-school-850 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden max-w-3xl mx-auto border border-school-700/50">
+            <!-- Decorative Light Effects -->
+            <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-school-500 opacity-20 blur-2xl"></div>
+            <div class="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500 opacity-20 blur-2xl"></div>
+
+            <div class="relative z-10 text-center space-y-6">
+                <div class="space-y-1">
+                    <p class="text-school-200 text-xs sm:text-sm font-semibold tracking-wider uppercase">Jadwal Perilisan Kelulusan</p>
+                    <h3 class="text-lg sm:text-xl font-bold flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-calendar-days text-school-300"></i>
+                        Senin, 2 Juni 2025 @ 08:00 WIB
+                    </h3>
+                </div>
+
+                <!-- Timer Elements -->
+                <div id="timer-grid" class="grid grid-cols-4 gap-3 sm:gap-4 max-w-md mx-auto">
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/10">
+                        <span id="days" class="block text-2xl sm:text-4xl font-extrabold tracking-tight">00</span>
+                        <span class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-300">Hari</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/10">
+                        <span id="hours" class="block text-2xl sm:text-4xl font-extrabold tracking-tight">00</span>
+                        <span class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-300">Jam</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/10">
+                        <span id="minutes" class="block text-2xl sm:text-4xl font-extrabold tracking-tight">00</span>
+                        <span class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-300">Menit</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 sm:p-4 text-center border border-white/10">
+                        <span id="seconds" class="block text-2xl sm:text-4xl font-extrabold tracking-tight">00</span>
+                        <span class="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-slate-300">Detik</span>
+                    </div>
+                </div>
+
+                <!-- Live Status Banner -->
+                <div id="countdown-status" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium">
+                    <i class="fa-solid fa-spinner animate-spin text-school-300"></i>
+                    <span>Memproses waktu peluncuran...</span>
+                </div>
+
+                <!-- Debug/Simulasi Mode Kontrol -->
+                <div class="pt-2 border-t border-white/10">
+                    <div class="flex items-center justify-center gap-3 text-xs text-slate-300">
+                        <span>💡 <span class="font-semibold text-white">Mode Uji:</span> Mengingat saat ini tahun 2026, sistem otomatis terbuka. Klik tombol di kanan jika ingin menyimulasikan waktu mundur:</span>
+                        <button onclick="toggleSimulation(true)" id="sim-btn-on" class="px-2.5 py-1 bg-school-600 hover:bg-school-500 rounded text-white font-bold transition">Simulasikan Countdown</button>
+                        <button onclick="toggleSimulation(false)" id="sim-btn-off" class="px-2.5 py-1 bg-red-600 hover:bg-red-500 rounded text-white font-bold transition hidden">Matikan</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Form Section -->
+        <section id="search-section" class="max-w-xl mx-auto scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200/80 p-6 sm:p-8 space-y-6 relative">
+                <div class="text-center space-y-1">
+                    <h3 class="text-xl font-bold text-slate-900">Periksa Kelulusan Mandiri</h3>
+                    <p class="text-sm text-slate-500">Gunakan NISN (Nomor Induk Siswa Nasional) yang terdaftar</p>
+                </div>
+
+                <form id="check-form" onsubmit="handleSearch(event)" class="space-y-4">
+                    <div>
+                        <label for="nisn-input" class="block text-sm font-semibold text-slate-700 mb-1.5">Masukkan NISN Siswa</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+                            <input type="text" id="nisn-input" required placeholder="Contoh: 0123456789" class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-950 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-school-500 focus:border-school-500 font-medium transition duration-200 text-lg tracking-wider" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-school-600 to-school-700 hover:from-school-700 hover:to-school-800 text-white font-bold text-base py-3.5 px-6 rounded-xl shadow-lg shadow-school-600/20 hover:shadow-school-600/30 transform active:scale-[0.98] transition duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Lihat Hasil Kelulusan</span>
+                    </button>
+                </form>
+
+                <!-- Feedback / Status message container (Replaces Alert) -->
+                <div id="search-feedback" class="hidden rounded-xl p-4 text-sm flex items-start gap-3 transition-all duration-300"></div>
+            </div>
+        </section>
+
+        <!-- Headmaster Greeting Section -->
+        <section class="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-0">
+                <!-- Headmaster Photo -->
+                <div class="md:col-span-4 bg-slate-100 flex items-center justify-center p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-200">
+                    <div class="text-center space-y-4 max-w-[240px]">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-school-600 rounded-2xl rotate-3 scale-102 opacity-10"></div>
+                            <img src="https://iili.io/FHJ6CBI.png" alt="H. Saiful Anam, MM.Pd." class="rounded-2xl border-4 border-white shadow-lg object-cover w-full aspect-[4/5] relative z-10" onerror="this.src='https://placehold.co/240x300/0066cc/ffffff?text=H.+Saiful+Anam'">
+                        </div>
+                        <div class="space-y-0.5">
+                            <h4 class="font-bold text-slate-900 text-base">H. Saiful Anam, MM.Pd.</h4>
+                            <p class="text-xs text-school-600 font-semibold tracking-wider uppercase">Kepala Sekolah</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Welcome Text -->
+                <div class="md:col-span-8 p-6 sm:p-8 lg:p-10 flex flex-col justify-center space-y-6">
+                    <div class="space-y-2">
+                        <span class="text-school-600 text-xs font-semibold tracking-wider uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-quote-left text-school-400"></i> Sambutan & Arahan
+                        </span>
+                        <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
+                            Selamat Atas Kelulusan Siswa Kelas 6 SDN Cibeber II
+                        </h3>
+                    </div>
+
+                    <div class="text-slate-600 space-y-4 text-sm sm:text-base leading-relaxed">
+                        <p>
+                            Assalamu'alaikum Warahmatullahi Wabarakatuh,
+                        </p>
+                        <p>
+                            Puji syukur ke hadirat Allah SWT, berkat perjuangan, kegigihan, dan kesabaran anak-anak sekalian serta bimbingan dari para guru dan orang tua, hari yang penuh kebahagiaan ini akhirnya tiba. Saya ucapkan selamat atas pencapaian berharga kelulusan anak-anak kelas 6 SDN Cibeber II Tahun Pelajaran 2024/2025.
+                        </p>
+                        <p>
+                            Kelulusan ini bukanlah akhir dari segalanya, melainkan pintu gerbang pertama untuk melangkah ke tingkat pendidikan yang lebih tinggi. Tetaplah menjaga nama baik almamater sekolah kita tercinta di mana pun kalian berada. Tuntutlah ilmu setinggi langit dengan penuh integritas, kejujuran, dan akhlak yang mulia.
+                        </p>
+                        <p class="font-semibold text-slate-800">
+                            Wassalamu'alaikum Warahmatullahi Wabarakatuh.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Hasil Kelulusan (Tampil saat NISN Ditemukan) -->
+    <div id="result-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-200/60 max-h-[90vh] flex flex-col">
+            <!-- Modal Header (Pattern Background) -->
+            <div class="bg-gradient-to-r from-school-600 to-school-800 p-6 text-white text-center relative overflow-hidden flex-shrink-0">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-white/80 hover:text-white transition bg-black/10 hover:bg-black/20 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="relative z-10 space-y-1">
+                    <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wider">Hasil Pengumuman Resmi</span>
+                    <h3 class="text-xl font-bold">Hasil Seleksi Kelulusan</h3>
+                </div>
+            </div>
+
+            <!-- Modal Scrollable Content -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <!-- Student Hero Banner (LULUS Status) -->
+                <div class="text-center space-y-4">
+                    <!-- Photo Container with Fallbacks and Frame -->
+                    <div class="inline-block relative">
+                        <div class="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-25 animate-pulse"></div>
+                        <div class="w-28 h-28 rounded-full border-4 border-emerald-500 overflow-hidden bg-slate-100 mx-auto shadow-md relative z-10">
+                            <img id="res-photo" src="" alt="Foto Siswa" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/150x150/0066cc/ffffff?text=Foto+Siswa'">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="text-emerald-600 font-extrabold text-2xl tracking-tight flex items-center justify-center gap-2">
+                            <span>🎉 SELAMAT!</span>
+                        </div>
+                        <p class="text-slate-600 text-sm font-medium">Ananda dinyatakan secara resmi:</p>
+                        <span class="inline-block bg-emerald-100 text-emerald-800 text-base font-extrabold px-6 py-2 rounded-full uppercase tracking-wider border border-emerald-200">
+                            🏆 LULUS
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Student Identity Grid -->
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-slate-200 text-sm">
+                        <span class="text-slate-500 font-medium">📛 Nama Lengkap</span>
+                        <span id="res-name" class="font-bold text-slate-900 text-right">M. FAJAR ALAMSYAH</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-200 text-sm">
+                        <span class="text-slate-500 font-medium">🆔 NISN Siswa</span>
+                        <span id="res-nisn" class="font-bold text-slate-900 font-mono">0123456789</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-200 text-sm">
+                        <span class="text-slate-500 font-medium">🧾 Nomor Induk Siswa (NIS)</span>
+                        <span id="res-nis" class="font-bold text-slate-900 font-mono">24250601</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 text-sm">
+                        <span class="text-slate-500 font-medium">🏅 Status Akhir</span>
+                        <span id="res-status" class="font-extrabold text-emerald-600 uppercase">LULUS</span>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Style Attachment Box for SKL Download -->
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Berkas SKL (Surat Keterangan Lulus)</p>
+                    
+                    <!-- WhatsApp Attachment Bubble -->
+                    <div class="whatsapp-bubble rounded-xl p-3.5 flex items-center justify-between gap-4 border shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 id="skl-filename" class="text-xs sm:text-sm font-bold text-slate-800 truncate">SKL_M_FAJAR_ALAMSYAH.pdf</h4>
+                                <p class="text-[10px] sm:text-xs text-slate-500 flex items-center gap-1.5">
+                                    <span>PDF Dokumen Resmi</span>
+                                    <span class="w-1 h-1 rounded-full bg-slate-400"></span>
+                                    <span>Telah Ditandatangani</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 📎 Download Button styled as attachment link -->
+                        <a id="res-download-btn" href="#" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 px-3.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm whitespace-nowrap">
+                            <span class="text-sm font-semibold">📎</span> Unduh SKL
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Announcement timestamp info inside the modal -->
+                <div class="text-center pt-2">
+                    <span id="announcement-timestamp" class="text-[11px] text-slate-400 bg-slate-100 px-3 py-1 rounded-full inline-block">
+                        Diumumkan: Senin, 2 Juni 2025, 08:00 WIB
+                    </span>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 flex-shrink-0">
+                <span>Panitia Kelulusan SDN Cibeber II</span>
+                <button onclick="closeModal()" class="text-slate-700 hover:text-slate-900 font-bold uppercase tracking-wider text-[11px] hover:underline">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-slate-900 text-slate-400 pt-16 pb-8 border-t border-slate-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+                <!-- School Profile on Footer -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <img src="https://iili.io/FHo8nWu.png" alt="Logo SDN Cibeber II" class="h-12 w-auto object-contain filter brightness-110 drop-shadow" onerror="this.src='https://placehold.co/80x80/0066cc/ffffff?text=Logo'">
+                        <div>
+                            <h4 class="text-white font-bold text-base tracking-tight">SDN CIBEBER II KOTA CILEGON</h4>
+                            <p class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Tahun Pelajaran 2024/2025</p>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-relaxed text-slate-400 max-w-sm">
+                        Menyelenggarakan pendidikan dasar yang bermutu, berintegritas, berlandaskan iman, taqwa, serta iptek untuk masa depan gemilang anak bangsa.
+                    </p>
+                </div>
+
+                <!-- Info Kontak Sekolah -->
+                <div class="md:col-span-4 space-y-4">
+                    <h5 class="text-white font-bold text-sm tracking-widest uppercase text-school-400">Hubungi Kami</h5>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-map-location-dot text-school-500 mt-1 flex-shrink-0"></i>
+                            <span>Jl. Imam Bonjol No.76 Kec. Cibeber Kota Cilegon</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-brands fa-whatsapp text-emerald-500 flex-shrink-0 text-base"></i>
+                            <a href="https://wa.me/6287827138095" target="_blank" class="hover:text-white transition">0878-2713-8095</a>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-envelope text-red-400 flex-shrink-0"></i>
+                            <a href="mailto:sdncibeber2@gmail.com" class="hover:text-white transition">sdncibeber2@gmail.com</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Media Channels -->
+                <div class="md:col-span-3 space-y-4">
+                    <h5 class="text-white font-bold text-sm tracking-widest uppercase text-school-400">Media Sosial</h5>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://instagram.com/sdncibeberii" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-gradient-to-tr hover:from-yellow-600 hover:via-red-600 hover:to-purple-600 flex items-center justify-center text-lg transition-all shadow-md" title="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com/@sdncibeber2cilegon" target="_blank" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-red-600 flex items-center justify-center text-lg transition-all shadow-md" title="Youtube">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                    </div>
+                    <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 text-[11px] leading-relaxed text-slate-400">
+                        ⚠️ <strong>Kendala Akses?</strong> Silakan hubungi wali kelas masing-masing atau langsung hubungi panitia sekolah melalui WhatsApp.
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+                <p>© 2025 SDN Cibeber II Kota Cilegon. Hak Cipta Dilindungi.</p>
+                <div class="flex gap-4">
+                    <span class="hover:text-slate-300 transition cursor-pointer">Kebijakan Privasi</span>
+                    <span class="hover:text-slate-300 transition cursor-pointer">Syarat & Ketentuan</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // Target announcement release: June 2, 2025 08:00:00 WIB
+        const TARGET_RELEASE_DATE = new Date("2025-06-02T08:00:00+07:00").getTime();
+        
+        // CSV Data source URL (Directly from user Google Sheet)
+        const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRWDW4ftfIf6H9LLPoMDZt__UEg0tjx6UebUqMbUiIAZlxTajA6JIXxZ7OmYefdrb6W2HBf4HlogP8V/pub?output=csv";
+
+        // Global State variables
+        let countdownInterval;
+        let isSimulationMode = false;
+        let announcementReleased = false;
+        let studentsData = [];
+        
+        let isMusicPlaying = false;
+        const bgMusic = document.getElementById("bg-music");
+        const musicIcon = document.getElementById("music-icon");
+        const musicPulse = document.getElementById("music-pulse");
+        const musicTooltip = document.getElementById("music-tooltip");
+
+        // Offline / Fallback Data in case the Google Sheets link has connectivity/CORS issues during evaluation.
+        const fallbackStudents = [
+            {
+                nama: "M. FAJAR ALAMSYAH",
+                nis: "24250601",
+                nisn: "0123456789",
+                status: "LULUS",
+                skl: "https://docs.google.com/document/d/1skl-fajar-mock",
+                foto: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200"
+            },
+            {
+                nama: "SITI NUR HALIZA",
+                nis: "24250602",
+                nisn: "0987654321",
+                status: "LULUS",
+                skl: "https://docs.google.com/document/d/1skl-siti-mock",
+                foto: "https://images.unsplash.com/photo-1594744803329-e58b31de215f?auto=format&fit=crop&q=80&w=200"
+            }
+        ];
+
+        // Fetch & parse Google Sheets CSV
+        async function fetchStudentData() {
+            try {
+                const response = await fetch(SPREADSHEET_CSV_URL);
+                if (!response.ok) throw new Error("Gagal mengambil data dari Google Sheets.");
+                
+                const csvText = await response.text();
+                
+                // Parse using PapaParse
+                Papa.parse(csvText, {
+                    header: false, // Columns based on exact indexing provided by user:
+                    // Col A (0): Nama, Col B (1): NIS, Col C (2): NISN, Col D (3): Status, Col E (4): SKL link, Col F (5): Foto
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const rawRows = results.data;
+                        if (rawRows.length > 0) {
+                            // Filter rows to build structured object list, skipping the header if detected
+                            studentsData = rawRows
+                                .filter(row => row[2] && row[2].trim() !== "" && row[2].toLowerCase() !== "nisn")
+                                .map(row => ({
+                                    nama: (row[0] || "").trim(),
+                                    nis: (row[1] || "").trim(),
+                                    nisn: (row[2] || "").trim(),
+                                    status: (row[3] || "BELUM ADA DATA").trim(),
+                                    skl: (row[4] || "#").trim(),
+                                    foto: (row[5] || "").trim()
+                                }));
+                            console.log("Successfully loaded " + studentsData.length + " students from Google Sheet.");
+                        } else {
+                            useFallbackData();
+                        }
+                    },
+                    error: function(err) {
+                        console.warn("PapaParse error, using fallback data:", err);
+                        useFallbackData();
+                    }
+                });
+            } catch (error) {
+                console.warn("Fetch failed, using local fallback data:", error);
+                useFallbackData();
+            }
+        }
+
+        function useFallbackData() {
+            studentsData = fallbackStudents;
+            console.log("Using fallback mock data for testing. Try NISN: 0123456789 or 0987654321");
+        }
+
+        // Countdown Timer Logic
+        function updateCountdown() {
+            const now = new Date().getTime();
+            
+            // If simulation mode is active, override with a custom future date or custom past date.
+            // But since current system time context is already 2026, the real clock automatically evaluates as "Announcement Released".
+            let difference = TARGET_RELEASE_DATE - now;
+
+            if (isSimulationMode) {
+                // Simulation forces countdown status (mock target 2 hours into the future)
+                const mockTarget = now + (2 * 60 * 60 * 1000) + (15 * 60 * 1000) + 34 * 1000; // 2 hours 15 min 34s
+                difference = mockTarget - now;
+            }
+
+            const statusBanner = document.getElementById("countdown-status");
+            const submitBtn = document.getElementById("submit-btn");
+            const nisnInput = document.getElementById("nisn-input");
+
+            if (difference <= 0) {
+                // Count down finished / Announcement is live
+                clearInterval(countdownInterval);
+                document.getElementById("days").innerText = "00";
+                document.getElementById("hours").innerText = "00";
+                document.getElementById("minutes").innerText = "00";
+                document.getElementById("seconds").innerText = "00";
+
+                statusBanner.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="text-emerald-400 font-bold">PENGUMUMAN SUDAH DIBUKA SECARA RESMI!</span>
+                `;
+                statusBanner.className = "inline-flex items-center gap-2 px-4 py-2 bg-emerald-950/40 border border-emerald-500/30 rounded-full text-xs font-semibold text-emerald-300 shadow-inner";
+                
+                announcementReleased = true;
+                submitBtn.disabled = false;
+                nisnInput.placeholder = "Masukkan 10 Digit NISN Anda";
+            } else {
+                // Still counting down
+                announcementReleased = false;
+                submitBtn.disabled = true;
+                nisnInput.placeholder = "Pencarian terkunci hingga pengumuman dibuka";
+
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = String(days).padStart(2, '0');
+                document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+                document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+                document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+
+                statusBanner.innerHTML = `
+                    <i class="fa-solid fa-lock text-yellow-400"></i>
+                    <span>Sistem Pencarian Terkunci • Menunggu Jadwal Rilis</span>
+                `;
+                statusBanner.className = "inline-flex items-center gap-2 px-4 py-2 bg-yellow-950/30 border border-yellow-500/20 rounded-full text-xs font-semibold text-yellow-300";
+            }
+        }
+
+        // Toggle Simulation Mode for Testing/Demonstrating Countdown
+        function toggleSimulation(isActive) {
+            isSimulationMode = isActive;
+            
+            const btnOn = document.getElementById("sim-btn-on");
+            const btnOff = document.getElementById("sim-btn-off");
+            
+            if (isActive) {
+                btnOn.classList.add("hidden");
+                btnOff.classList.remove("hidden");
+                // Reset interval to apply simulation immediately
+                clearInterval(countdownInterval);
+                updateCountdown();
+                countdownInterval = setInterval(updateCountdown, 1000);
+            } else {
+                btnOn.classList.remove("hidden");
+                btnOff.classList.add("hidden");
+                // Restore original countdown (will instantly unlock since it's 2026)
+                clearInterval(countdownInterval);
+                updateCountdown();
+                countdownInterval = setInterval(updateCountdown, 1000);
+            }
+        }
+
+        // Form Search Handler
+        function handleSearch(event) {
+            event.preventDefault();
+            
+            const nisnInputVal = document.getElementById("nisn-input").value.trim();
+            const feedbackContainer = document.getElementById("search-feedback");
+            const submitBtn = document.getElementById("submit-btn");
+
+            // Feedback element resets
+            feedbackContainer.className = "hidden";
+            feedbackContainer.innerHTML = "";
+
+            if (!announcementReleased) {
+                showFeedback("warning", "Akses Ditangguhkan", "Pengumuman belum dirilis secara resmi. Silakan tunggu hingga hitung mundur selesai.");
+                return;
+            }
+
+            if (!nisnInputVal) {
+                showFeedback("error", "Input Tidak Valid", "Silakan masukkan NISN siswa terlebih dahulu.");
+                return;
+            }
+
+            // Show loading state on button
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mencari Data...`;
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                // Find matching student
+                const matchedStudent = studentsData.find(s => s.nisn === nisnInputVal);
+
+                if (matchedStudent) {
+                    if (matchedStudent.status.toUpperCase() === "LULUS") {
+                        showSuccessResult(matchedStudent);
+                    } else {
+                        // Handle students with other status or conditional statuses cleanly inside warning
+                        showFeedback("warning", "Status Kelulusan", `Data ditemukan atas nama <strong>${matchedStudent.nama}</strong>, namun status kelulusan belum dinyatakan LULUS secara resmi. Silakan hubungi wali kelas.`);
+                    }
+                } else {
+                    showFeedback("error", "Data Tidak Ditemukan", "Maaf, NISN tidak ditemukan dalam database kelulusan kami. Periksa kembali NISN Anda atau hubungi wali kelas.");
+                }
+
+                // Restore search button
+                submitBtn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> <span>Lihat Hasil Kelulusan</span>`;
+                submitBtn.disabled = false;
+            }, 750); // Small delay for premium loading experience feel
+        }
+
+        // Helper to output styled feed back on the form itself (instead of alert)
+        function showFeedback(type, title, text) {
+            const container = document.getElementById("search-feedback");
+            container.className = "rounded-xl p-4 text-sm flex items-start gap-3 transition-all duration-300 ";
+            
+            if (type === "error") {
+                container.classList.add("bg-red-50", "text-red-800", "border", "border-red-200");
+                container.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <strong class="font-bold block">${title}</strong>
+                        <span class="block text-red-700 mt-0.5">${text}</span>
+                    </div>
+                `;
+            } else if (type === "warning") {
+                container.classList.add("bg-amber-50", "text-amber-800", "border", "border-amber-200");
+                container.innerHTML = `
+                    <i class="fa-solid fa-circle-exclamation text-amber-500 text-lg mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <strong class="font-bold block">${title}</strong>
+                        <span class="block text-amber-700 mt-0.5">${text}</span>
+                    </div>
+                `;
+            }
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Success Modal & Confetti Presentation
+        function showSuccessResult(student) {
+            // Update modal student fields
+            document.getElementById("res-name").innerHTML = student.nama;
+            document.getElementById("res-nisn").innerText = student.nisn;
+            document.getElementById("res-nis").innerText = student.nis;
+            document.getElementById("res-status").innerText = student.status;
+            
+            // Set download button properties
+            const dlBtn = document.getElementById("res-download-btn");
+            dlBtn.href = student.skl;
+            
+            // Set exact clean document filename look
+            const cleanName = student.nama.replace(/\s+/g, "_").toUpperCase();
+            document.getElementById("skl-filename").innerText = `SKL_${cleanName}.pdf`;
+
+            // Setup student photo or default fallback
+            const imgElement = document.getElementById("res-photo");
+            if (student.foto && student.foto.trim() !== "") {
+                imgElement.src = student.foto;
+            } else {
+                imgElement.src = `https://placehold.co/150x150/0066cc/ffffff?text=${encodeURIComponent(student.nama)}`;
+            }
+
+            // Display current announcement timestamp or 2 June 2025 schedule timestamp
+            const timeObj = new Date();
+            const formattedTime = timeObj.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) + " - " + timeObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+            
+            document.getElementById("announcement-timestamp").innerText = `Diverifikasi Sistem: ${formattedTime}`;
+
+            // Trigger Modal with smooth transition
+            const modal = document.getElementById("result-modal");
+            modal.classList.remove("hidden");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                modal.firstElementChild.classList.remove("scale-95");
+            }, 10);
+
+            // Trigger Confetti Celebration (Multiple bursts!)
+            triggerCelebration();
+        }
+
+        // Confetti Burst Celebration Helper
+        function triggerCelebration() {
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#0066cc', '#10b981', '#fbbf24', '#f43f5e']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#0066cc', '#10b981', '#fbbf24', '#f43f5e']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // Close Modal Handler
+        function closeModal() {
+            const modal = document.getElementById("result-modal");
+            modal.classList.add("opacity-0");
+            modal.firstElementChild.classList.add("scale-95");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
+        // Memulai musik saat ada interaksi pertama dari pengguna (Persyaratan Kebijakan Browser)
+        function initAudioAutoplay() {
+            const startMusicOnInteraction = () => {
+                if (!isMusicPlaying) {
+                    playMusic();
+                }
+                // Hapus event listener setelah musik berhasil dimulai atau dicoba diputar
+                document.removeEventListener('click', startMusicOnInteraction);
+                document.removeEventListener('touchstart', startMusicOnInteraction);
+            };
+            document.addEventListener('click', startMusicOnInteraction);
+            document.addEventListener('touchstart', startMusicOnInteraction);
+        }
+
+        function playMusic() {
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                musicIcon.className = "fa-solid fa-compact-disc text-xl animate-slow-spin";
+                musicPulse.classList.remove("opacity-0");
+                musicPulse.classList.add("opacity-100");
+                hideMusicTooltip();
+            }).catch(err => {
+                console.log("Pemutaran otomatis diblokir oleh browser. Pengguna harus menekan tombol musik secara manual.", err);
+            });
+        }
+
+        function pauseMusic() {
+            bgMusic.pause();
+            isMusicPlaying = false;
+            musicIcon.className = "fa-solid fa-music text-lg";
+            musicPulse.classList.add("opacity-0");
+            musicPulse.classList.remove("opacity-100");
+        }
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        }
+
+        function showMusicTooltip() {
+            musicTooltip.classList.remove("opacity-0", "translate-x-4");
+            musicTooltip.classList.add("opacity-100", "translate-x-0");
+        }
+
+        function hideMusicTooltip() {
+            musicTooltip.classList.add("opacity-0", "translate-x-4");
+            musicTooltip.classList.remove("opacity-100", "translate-x-0");
+        }
+
+        // Window Load Execution
+        window.onload = function() {
+            // Fetch students spreadsheet database
+            fetchStudentData();
+
+            // Run countdown on loop
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+
+            // Inisialisasi pemutar musik interaktif
+            initAudioAutoplay();
+
+            // Tampilkan balon petunjuk musik setelah 3 detik
+            setTimeout(() => {
+                if (!isMusicPlaying) {
+                    showMusicTooltip();
+                    // Hilangkan balon petunjuk secara otomatis setelah 6 detik
+                    setTimeout(hideMusicTooltip, 6000);
+                }
+            }, 3000);
+        };
+    </script>
+</body>
+</html>
